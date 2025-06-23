@@ -1,5 +1,6 @@
 package com.tenco.blog.board;
 
+import com.tenco.blog.user.User;
 import com.tenco.blog.utils.MyDateUtil;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -27,7 +28,16 @@ public class Board {
     // 별도 어노테이션이 없으면 필드명이 컬럼명이 됨
     private String title;
     private String content;
-    private String username;
+
+    // V2에서 제거: private String username;
+    // V3에서 추가: Board 엔티티 User 엔티티와의 연관관계 성립
+
+    // @ManyToOne 다대일 연관관계: 여러 게시글이 하나의 사용자에게 속함
+    // FetchType.LAZY: 지연로딩으로 성능 최적화 (User 정보가 필요할 때만 조회)
+    // @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id") // 외래키 컬럼명 명시
+    private User user;
 
     // @CreationTimestamp : hibernate가 제공하는 어노테이션
     // Entity가 처음 저장할 때 현재 시간을 자동으로 설정한다.
@@ -36,13 +46,13 @@ public class Board {
     @CreationTimestamp
     private Timestamp createdAt; // created_at (스네이크 케이스로 자동 변환)
 
-    // 생성자 만들어 주기
-    public Board(String title, String content, String username) {
-        this.title = title;
-        this.content = content;
-        this.username = username;
-        // id 와 createdAt은 JPA / Hibernate 가 자동으로 설정
-    }
+//    생성자 만들어 주기
+//    public Board(String title, String content, String username) {
+//        this.title = title;
+//        this.content = content;
+//        this.username = username;
+//        // id 와 createdAt은 JPA / Hibernate 가 자동으로 설정
+//    }
 
     // 머스태치에서 표현할 시간의 포맷기능(행위)을 스스로 만들자.
     public String getTime() {
