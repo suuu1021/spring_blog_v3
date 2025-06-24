@@ -41,4 +41,24 @@ public class UserRequest {
         }
     }
 
+    // 로그인 용 DTO
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginDTO {
+        private String username;
+        private String password;
+
+        // 유효성 검사
+        public void validate() {
+            if (username == null || username.trim().isEmpty()) {
+                throw new IllegalArgumentException("사용자 명을 입력해주세요");
+            }
+            if (password == null || password.trim().isEmpty()) {
+                throw new IllegalArgumentException("비밀번호를 입력해주세요");
+            }
+        }
+    }
+
 }
