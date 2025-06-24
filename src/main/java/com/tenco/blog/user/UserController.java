@@ -1,15 +1,59 @@
 package com.tenco.blog.user;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+@RequiredArgsConstructor // DI 처리
 @Controller
 public class UserController {
 
-    // 요청되어 오는 주소 --> /join-form
+    private final UserRepository userRepository;
+
+    /**
+     * 회원 가입 화면 요청
+     *
+     * @return join-form.mustache
+     */
     @GetMapping("/join-form")
     public String joinForm() {
         return "user/join-form";
+    }
+
+    // 회원 가입 액션 처리
+    @PostMapping("/join")
+    public String join(UserRequest.JoinDTO joinDTO, HttpServletRequest request) {
+        System.out.println("=== 회원가입 요청 ===");
+        System.out.println("사용자 명: " + joinDTO.getUsername());
+        System.out.println("사용자 이메일: " + joinDTO.getEmail());
+
+        try {
+            // 1. 입력된 데이터 검증 (유효성 검사)
+            joinDTO.validate();
+
+            // 2. 사용자 명 중복 체크
+            User exsistUser = userRepository.findByUsername(joinDTO.getUsername());
+            if (exsistUser != null) {
+                throw new IllegalArgumentException("이미 존재하는 사용자명 입니다" + joinDTO.getUsername());
+            }
+
+            // 3. DTO를 User Object로 변환
+            User user = joinDTO.toEntity();
+
+            // 4. User Object를 영속화 처리
+            userRepository.save(user);
+
+            return "redirect:/login-form";
+
+        } catch (Exception e) {
+            // 검증 실패 시 보통 에러 메세지와 함께 다시 폼에 전달
+            request.setAttribute("errorMessage", "잘못된 요청입니다");
+            return "user/join-form";
+        }
     }
 
     @GetMapping("/login-form")
