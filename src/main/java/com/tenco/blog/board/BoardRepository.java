@@ -5,7 +5,6 @@ import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @RequiredArgsConstructor // 생성자 자동 생성 + 멤버 변수 확인 -> DI 처리
