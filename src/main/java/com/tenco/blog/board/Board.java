@@ -3,12 +3,16 @@ package com.tenco.blog.board;
 import com.tenco.blog.user.User;
 import com.tenco.blog.utils.MyDateUtil;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
+@Builder
+@AllArgsConstructor
 // 기본 생성자 = JPA에서 Entity는 기본 생성자가 필요
 @NoArgsConstructor
 @Data
@@ -17,6 +21,7 @@ import java.sql.Timestamp;
 // @Entity JPA가 이 클래스를 데이터베이스 테이블과 맵핑하는 객체(entity)로 인식
 // 즉, @Entity 어노테이션이 있어야 JPA가 이 객체를 관리한다.
 @Entity
+
 public class Board {
 
     // @Id 이 필드가 기본키(Primary key)임을 나타냄
