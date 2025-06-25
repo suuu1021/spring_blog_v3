@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+
 import java.sql.Timestamp;
 
 @Builder
@@ -50,16 +51,14 @@ public class Board {
     @CreationTimestamp
     private Timestamp createdAt; // created_at (스네이크 케이스로 자동 변환)
 
-//    생성자 만들어 주기
-//    public Board(String title, String content, String username) {
-//        this.title = title;
-//        this.content = content;
-//        this.username = username;
-//        // id 와 createdAt은 JPA / Hibernate 가 자동으로 설정
-//    }
+    // 게시글 소유자를 직접 확인하는 기능을 만들자
+    public boolean isOwner(Long checkUserId) {
+        return this.user.getId().equals(checkUserId);
+    }
 
     // 머스태치에서 표현할 시간의 포맷기능(행위)을 스스로 만들자.
     public String getTime() {
         return MyDateUtil.timestampFormat(createdAt);
     }
+
 }

@@ -16,6 +16,8 @@ public class BoardRequest {
         private String content;
         // username 제거 : 세션에서 가져올 예정
 
+        // 게시글 조회 및 저장 시, 작성자 정보(user_id)가 필요하기 때문에
+        // Board 클래스에 User 객체가 포함되어 있음
         // (User) <-- toEntity() 호출할 때 세션에서 가져와서 넣어주면 됨
         public Board toEntity(User user) {
             return Board.builder()

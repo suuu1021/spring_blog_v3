@@ -1,10 +1,12 @@
 package com.tenco.blog.board;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @RequiredArgsConstructor // 생성자 자동 생성 + 멤버 변수 확인 -> DI 처리
@@ -14,8 +16,41 @@ public class BoardRepository {
     // DI
     private final EntityManager em;
 
+    // 게시글 삭제
+    @Transactional
+    public void deleteById(Long id) {
+        // 1. 네이티브 쿼리 (테이블 대상으로 질의어)
+        // 2. JPQL(객체 지향 쿼리 언어 - 엔티티 객체를 대상으로 질의어)
+        // 3. 영속성 처리 (em) - CRUD
+        String jpql = "DELETE FROM Board b WHERE b.id = :id ";
+        Query query = em.createQuery(jpql);
+        query.setParameter("id", id);
+        int deleteCount = query.executeUpdate(); // I, U, D
+        if (deleteCount == 0) {
+            throw new IllegalArgumentException("삭제할 게시글이 없습니다.");
+        }
+    }
+
+    @Transactional
+    public void deleteByIdSafely(Long id) {
+        // 영속성 컨텍스트를 활용한 삭제 처리
+        // 1. 먼저 삭제할 엔티티를 영속 상태로 조회
+        Board board = em.find(Board.class, id);
+        // board -> 영속화 됨
+        // 2. 엔티티 존재 여부 확인
+        if (board == null) {
+            throw new IllegalArgumentException("삭제할 게시글이 없습니다.");
+        }
+        // 3. 영속화 상태의 엔티티를 삭제 상태로 변경
+        em.remove(board);
+        // ( 장점 )
+        // 1차 캐시에서 자동 제거 된다
+        // 연관관계 처리도 자동 수행 된다 (cascade)
+    }
+
     /**
      * 게시글 저장 : User와 연관관계를 가진 Board 엔티티 영속화
+     *
      * @param board
      * @return
      */
