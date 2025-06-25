@@ -15,6 +15,37 @@ public class UserController {
     // httpSession <--- 세션 메모리에 접근을 할 수 있음
     private final HttpSession httpSession;
 
+    // 회원 정보 수정 화면
+    // 주소 설계 : http://localhost:8080/user/update-form
+    @GetMapping("/user/update-form")
+    public String updateForm(HttpServletRequest request, HttpSession session) {
+        // 1. 로그인 체크
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/login-form";
+        }
+        request.setAttribute("user", sessionUser);
+        return "user/update-form";
+    }
+
+    // 회원 정보 수정 액션 처리
+    @PostMapping("/user/update")
+    public String update(UserRequest.UpdateDTO reqDTO,
+                         HttpSession session, HttpServletRequest request) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            return "redirect:/login-form";
+        }
+        // 데이터 유효성 검사 처리
+        reqDTO.validate();
+        // 회원 정보 수정은 권한 체크가 필요 없다 (세션에서 정보를 가져오기 때문)
+        User updateUser = userRepository.updateById(sessionUser.getId(), reqDTO);
+        // 세션 동기화
+        session.setAttribute("sessionUser", updateUser);
+        // 다시 회원 정보 보기 화면 요청 - GET 요청
+        return "redirect:/user/update-form";
+    }
+
     /**
      * 회원 가입 화면 요청
      *
@@ -107,12 +138,6 @@ public class UserController {
         // 즉 리다이렉트 한다는 것은 뷰를 렌더링 하지 않고 브라우저가 재요청을
         // 다시 하게끔 유도 한다.
         return "redirect:/";
-    }
-
-    // 주소 설계 : http://localhost:8080/user/update-form
-    @GetMapping("/user/update-form")
-    public String updateForm() {
-        return "user/update-form";
     }
 
 }
